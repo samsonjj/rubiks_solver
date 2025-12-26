@@ -1,5 +1,5 @@
 import pygame
-from typing import List, Self
+from typing import Set, Dict, List, Self
 
 class Permutation():
     def __init__(self):
@@ -26,6 +26,16 @@ def base() -> List[int]:
         36,37,38,39,40,41,42,43,44,
         45,46,47,48,49,50,51,52,53,
     ]
+
+def base_tup() -> tuple[int]:
+    return (
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+        9,10,11,12,13,14,15,16,17,
+        18,19,20,21,22,23,24,25,26,
+        27,28,29,30,31,32,33,34,35,
+        36,37,38,39,40,41,42,43,44,
+        45,46,47,48,49,50,51,52,53,
+    )
 
 def permute(a: List[int], b: List[int]) -> List[int]:
     result = [None] * len(a)
@@ -162,6 +172,9 @@ def main():
 def handle_key_event(event, game: Game): 
     if event.key == pygame.K_ESCAPE:
         game.running = False
+    
+    if event.key == pygame.K_1:
+        print(init_search(game.state))
 
     key_helper(event, game, pygame.K_RIGHT, TS, TSI)
     key_helper(event, game, pygame.K_LEFT, TSI, TS)
@@ -194,6 +207,54 @@ def key_helper(event, game, k, t1, t2):
         else:
             game.state = permute(game.state, t1)
 
+from collections import deque
+
+def get_adjacent_permutations(a: List[int]):
+    yield permute(a, TR)
+    yield permute(a, TL)
+    yield permute(a, TF)
+    yield permute(a, TD)
+    yield permute(a, TT)
+    yield permute(a, TB)
+
+    yield permute(a, TRI)
+    yield permute(a, TLI)
+    yield permute(a, TFI)
+    yield permute(a, TDI)
+    yield permute(a, TTI)
+    yield permute(a, TBI)
+
+
+def init_search(curr: List[int]):
+    visited = {hash_permutation(curr): 0} 
+    return search(visited, deque([curr]))
+
+def search(visited: Dict[int, int], queue: deque[List[int]]):
+    print(queue.__len__)
+    while len(queue) > 0:
+        curr = queue.popleft()
+
+        curr_hash = hash_permutation(curr)
+        if visited[curr_hash] > 5:
+            continue # reached max depth
+
+        for next in get_adjacent_permutations(curr):
+            next_hash = hash_permutation(next)
+            if next_hash not in visited:
+                visited[next_hash] = visited[curr_hash] + 1 # depth
+                queue.append(next)
+
+            if tuple(next) == base_tup():
+                return visited[next_hash]
+    
+    return None
+
+
+def hash_permutation(a: List[int]) -> int:
+    return hash(tuple(a))
 
 if __name__ == "__main__":
+    curr = permute(base(), TF)
+    # visted = {hash_permutation(curr): 0}
+    print(init_search(curr))
     main()
