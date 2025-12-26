@@ -101,9 +101,9 @@ def as_str(a: List[int]) -> str:
 
 def as_code(a: List[int]) -> str:
     return "[\n  " + "\n  ".join([
-        ", ".join([
+        ",".join([
             "{:>2}".format(a[x+y*9]) for x in range(9)
-        ])
+        ]) + ","
         for y in range(6)
     ]) + "\n]"
 
@@ -144,9 +144,9 @@ def draw_face(screen: pygame.Surface, face: List[int], offset_x: float, offset_y
             get_color(val),
             pygame.Rect(offset_x + (i % 3) * W, offset_y + (i // 3) * W, W-2, W-2)
         )
-        my_font = pygame.font.SysFont('Comic Sans MS', W // 2, True)
-        text_surface = my_font.render(str(val), True, (0, 0, 0))
-        screen.blit(text_surface, (offset_x + (i % 3) * W + .15 * W, offset_y + (i // 3) * W + .1 * W))
+        # my_font = pygame.font.SysFont('Comic Sans MS', W // 2, True)
+        # text_surface = my_font.render(str(val), True, (0, 0, 0))
+        # screen.blit(text_surface, (offset_x + (i % 3) * W + .15 * W, offset_y + (i // 3) * W + .1 * W))
 
 class Game:
     def __init__(self): 
@@ -175,6 +175,10 @@ def handle_key_event(event, game: Game):
     
     if event.key == pygame.K_1:
         print(init_search(game.state, hash(base_tup())))
+    
+    if event.key == pygame.K_2:
+        print(as_code(game.state))
+
 
     key_helper(event, game, pygame.K_RIGHT, TS, TSI)
     key_helper(event, game, pygame.K_LEFT, TSI, TS)
@@ -268,5 +272,26 @@ def search(visited: Dict[int, int], queue: deque[List[int]], target_hash: int):
 def hash_permutation(a: List[int]) -> int:
     return hash(tuple(a))
 
+def benchmark():
+    state = [
+        27,  1,  6, 30,  4,  3, 33,  7,  0,
+        9, 10, 38, 12, 13, 14, 11, 16, 36,
+        18, 19, 47, 21, 22, 50, 24, 25, 53,
+        8, 28, 29,  5, 31, 32,  2, 34, 35,
+        44, 37, 15, 39, 40, 41, 42, 43, 17,
+        26, 46, 51, 23, 49, 48, 20, 52, 45,
+    ]
+    init_search(state, hash_permutation(base()))
+
+
+
+
 if __name__ == "__main__":
-    main()
+    import cProfile
+    import time
+
+    start = time.time()
+    cProfile.run('benchmark()')
+    end = time.time()
+
+    print("time: {}".format(end - start))
