@@ -75,7 +75,7 @@ TR = [
     18,19,20,21,22,23,24,25,26,
     17,28,29,14,31,32,11,34,35,
     36,37,33,39,40,30,42,43,27,
-    45,46,47,48,49,50,51,52,53,
+    51,48,45,52,49,46,53,50,47,
 ]
 TRI = Permutation().t_x(TR, 3).out()
 TSI = Permutation().t_x(TS, 3).out()
@@ -174,7 +174,7 @@ def handle_key_event(event, game: Game):
         game.running = False
     
     if event.key == pygame.K_1:
-        print(init_search(game.state))
+        print(init_search(game.state, hash(base_tup())))
 
     key_helper(event, game, pygame.K_RIGHT, TS, TSI)
     key_helper(event, game, pygame.K_LEFT, TSI, TS)
@@ -225,12 +225,28 @@ def get_adjacent_permutations(a: List[int]):
     yield permute(a, TBI)
 
 
-def init_search(curr: List[int]):
+def init_search(curr: List[int], target_hash: int):
     visited = {hash_permutation(curr): 0} 
-    return search(visited, deque([curr]))
+    result = search(visited, deque([curr]), target_hash)
 
-def search(visited: Dict[int, int], queue: deque[List[int]]):
-    print(queue.__len__)
+    if result is not None:
+        return result
+    
+    # attempt reverse search algorithm
+
+    visited2 = {hash_permutation(base()): 0}
+    search(visited2, deque([base()]), hash_permutation(curr))
+
+    visited_set1 = set(visited.keys())
+    visited_set2 = set(visited2.keys())
+    intersection = visited_set1.intersection(visited_set2)
+    if len(intersection) == 0:
+        return None
+    
+    return min([visited[x] + visited2[x] for x in intersection])
+    
+
+def search(visited: Dict[int, int], queue: deque[List[int]], target_hash: int):
     while len(queue) > 0:
         curr = queue.popleft()
 
@@ -244,17 +260,13 @@ def search(visited: Dict[int, int], queue: deque[List[int]]):
                 visited[next_hash] = visited[curr_hash] + 1 # depth
                 queue.append(next)
 
-            if tuple(next) == base_tup():
+            if next_hash == target_hash:
                 return visited[next_hash]
     
     return None
-
 
 def hash_permutation(a: List[int]) -> int:
     return hash(tuple(a))
 
 if __name__ == "__main__":
-    curr = permute(base(), TF)
-    # visted = {hash_permutation(curr): 0}
-    print(init_search(curr))
     main()
