@@ -38,10 +38,7 @@ def base_tup() -> tuple[int]:
     )
 
 def permute(a: List[int], b: List[int]) -> List[int]:
-    result = [None] * len(a)
-    for i in range(len(a)):
-        result[i] = a[b[i]]
-    return result
+    return [a[b[i]] for i in range(len(a))]
 
 def unpermute(a: List[int], b: List[int]) -> List[int]:
     result = [None] * len(a)
@@ -179,6 +176,9 @@ def handle_key_event(event, game: Game):
     if event.key == pygame.K_2:
         print(as_code(game.state))
 
+    if event.key == pygame.K_3:
+        game.state = base()
+
 
     key_helper(event, game, pygame.K_RIGHT, TS, TSI)
     key_helper(event, game, pygame.K_LEFT, TSI, TS)
@@ -247,6 +247,9 @@ def init_search(curr: List[int], target_hash: int):
     if len(intersection) == 0:
         return None
     
+    print("len 1: {}".format(len(visited)))
+    print("len 2: {}".format(len(visited2)))
+    
     return min([visited[x] + visited2[x] for x in intersection])
     
 
@@ -287,11 +290,12 @@ def benchmark():
 
 
 if __name__ == "__main__":
-    import cProfile
-    import time
+    # import cProfile
+    # import time
 
-    start = time.time()
-    cProfile.run('benchmark()')
-    end = time.time()
+    # start = time.time()
+    # cProfile.run('benchmark()')
+    # end = time.time()
 
-    print("time: {}".format(end - start))
+    # print("time: {}".format(end - start))
+    main()
