@@ -1,0 +1,24 @@
+[package]
+name = "rubixpy"
+version = "0.1.0"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "rubixpy"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "bench1"
+path = "src/bin/bench1.rs"
+
+[dependencies]
+itertools = "0.14.0"
+
+[dependencies.pyo3]
+version = "0.27.0"
+
+[features]
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]
